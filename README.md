@@ -81,8 +81,6 @@ src/features/<new_analysis>/
 ├─ metrics.py # pandas calculations
 └─ viz.py # optional charts/plots
 ```
-markdown
-Copy code
 
 2. **Add SQL templates**
 
