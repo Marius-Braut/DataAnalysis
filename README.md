@@ -69,13 +69,12 @@ Each analysis is a self-contained feature under `src/features/`.
 ### Step-by-step
 
 1. **Create the new module**
+2. ```text
 src/features/<new_analysis>/
 ├─ run.py # CLI entrypoint (args/env → SQL → metrics → exports)
 ├─ metrics.py # pandas calculations
 └─ viz.py # optional charts/plots
-
-markdown
-Copy code
+```
 
 2. **Add SQL templates**
 sql/<new_analysis>_base.sql.j2
