@@ -59,7 +59,7 @@ DataAnalysis/
 │           └─ viz.py
 ├─ data/                 # local cache (gitignored)
 └─ reports/              # outputs (csv/png/md)
-
+```
 ---
 
 ## Adding another analysis
