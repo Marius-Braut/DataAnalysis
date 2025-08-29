@@ -18,13 +18,13 @@ First analysis: **FitAccuracy**.
 
 ### Environment variables
 - A `.env` file in the project root contains runtime config such as:
-
+```text
 GCP_PROJECT=volumental-data
 BQ_LOCATION=EU
 MAX_BYTES_BILLED=80000000000
 CACHE_DIR=./data
 REPORTS_DIR=./reports
-
+```
 - The `.env` file is loaded automatically when running analyses.
 
 ### Run Configuration (PyCharm)
