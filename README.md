@@ -62,29 +62,58 @@ DataAnalysis/
 ```
 ---
 
-## Adding another analysis
+## Adding a New Analysis
 
-Each analysis is a self-contained feature under `src/features/`.
+To add a new analysis to this project, follow these steps:
 
-1. **Create the new module**
-```text
-src/features/<new_analysis>/
-├─ run.py # CLI entrypoint (args/env → SQL → metrics → exports)
-├─ metrics.py # pandas calculations
-└─ viz.py # optional charts/plots
-```
+1. **Create the feature package**
+   - Make a new folder under `src/features/` named after your analysis (e.g. `scans_performance`).
+   - Inside it, create an empty `__init__.py` file to make it a Python package.
+   - Add a `run.py` script here — this will be the entry point for your analysis.
 
-2. **Add SQL templates**
+2. **Create the SQL folder**
+   - Under `sql/`, create a folder named after your analysis (e.g. `ScansPerformance`).
+   - Add one or more `.sql.j2` files here for your queries.
 
-3. **Reuse utilities**
-- Import BigQuery helpers from `src/volu_bq/` (client, query, cache).
-- Reuse any common helpers from `src/utils/`.
+3. **Write your queries**
+   - In the `.sql.j2` file(s), write the BigQuery SQL your analysis needs.
+   - If your analysis requires parameters (dates, filters, etc.), use named parameters (`@start_date`, `@end_date`, etc.).
+   - These will be passed in from Python when the analysis runs.
 
-4. **Configure Run Configuration in PyCharm**
-- **Script path:** `src/features/<new_analysis>/run.py`
-- **Working directory:** project root
-- **Env file:** `.env`
-- (Optional) add script parameters, e.g.:
-  ```
-  --start 2025-01-01 --end 2025-03-31
-  ```
+4. **Use the shared helpers**
+   - Use `src/volu_bq/query.py` to execute your SQL templates.
+   - Use `src/utils/paths.py` (`analysis_out_dir`, `analysis_sql_path`) to resolve paths and save results into the correct folder under `reports/`.
+   - Use plotting functions from `src/plotting_functions/` (e.g. `bar_plot`) for charts.
+
+5. **Decide on outputs**
+   - Each analysis should write its outputs (CSV, PNG, etc.) to `reports/<AnalysisName>/`.
+   - You can choose to add a timestamped subfolder if you want to keep multiple runs.
+
+6. **Register it in the Makefile**
+   - Add a new target in the `Makefile` for your analysis.
+   - Typically, you’ll want three commands:
+     - `run-<analysis>` → runs the analysis with required parameters.
+     - `clean-<analysis>` → deletes the reports for that analysis.
+     - `rerun-<analysis>` → cleans and runs in one step.
+
+7. **(Optional) PyCharm Run Configuration**
+   - In PyCharm, create a new Run Configuration pointing at your `run.py` script.
+   - Use the project root as the working directory, and load `.env` as the environment file.
+   - Add any arguments (like `--start-date` and `--end-date`) in the parameters field.
+
+8. **Test the flow**
+   - Run the analysis either from PyCharm or the terminal (via `make run-<analysis>`).
+   - Verify that CSVs and plots are written into `reports/<AnalysisName>/`.
+
+---
+
+### Example Workflow
+
+- Add a new analysis: `ScansPerformance`.
+- Create `src/features/scans_performance/run.py`.
+- Create `sql/ScansPerformance/scans_by_top_org.sql.j2`.
+- Add Makefile commands: `run-scans-performance`, `clean-scans-performance`, `rerun-scans-performance`.
+- Run it:
+  ```bash
+  make run-scans-performance start=2025-01-01 end=2025-08-10
+
