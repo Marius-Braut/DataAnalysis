@@ -39,8 +39,8 @@ clean-reports:
 		echo "❌ Please specify which analysis to clean, e.g. make clean-reports analysis=FitAccuracy"; \
 		exit 1; \
 	fi
-	rm -rf reports/$(analysis)/*
-	@echo "🧹 Reports for $(analysis) have been cleaned ✅"
+	rm -rf reports/$(analysis)
+	@echo "🧹 Reports folder for $(analysis) has been fully removed ✅"
 
 # Convenience cleaners for common analyses
 clean-fit-accuracy:
@@ -50,10 +50,13 @@ clean-scans-performance:
 	$(MAKE) clean-reports analysis=ScansPerformance
 
 # -----------------------------
-# Rerun = clean + run
+# Rerun = clean + run + final confirmation
 # -----------------------------
 
-rerun-fit-accuracy: clean-fit-accuracy run-fit-accuracy
+rerun-fit-accuracy:
+	$(MAKE) clean-fit-accuracy
+	$(MAKE) run-fit-accuracy
+	@echo "♻️  FitAccuracy rerun completed successfully."
 
 rerun-scans-performance:
 	@if [ -z "$(start)" ] || [ -z "$(end)" ]; then \
@@ -62,3 +65,4 @@ rerun-scans-performance:
 	fi
 	$(MAKE) clean-scans-performance
 	$(MAKE) run-scans-performance start=$(start) end=$(end) $(if $(top_org),top_org="$(top_org)",)
+	@echo "♻️  ScansPerformance rerun completed successfully for $(start) → $(end)."
