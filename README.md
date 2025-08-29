@@ -68,20 +68,23 @@ Each analysis is a self-contained feature under `src/features/`.
 
 ### Step-by-step
 
+---
+
+## Adding another analysis
+
+Each analysis is a self-contained feature under `src/features/`.
+
 1. **Create the new module**
-2. ```text
+```text
 src/features/<new_analysis>/
 ├─ run.py # CLI entrypoint (args/env → SQL → metrics → exports)
 ├─ metrics.py # pandas calculations
 └─ viz.py # optional charts/plots
 ```
-
-2. **Add SQL templates**
-sql/<new_analysis>_base.sql.j2
-sql/<new_analysis>_breakdowns.sql.j2
-
 markdown
 Copy code
+
+2. **Add SQL templates**
 
 3. **Reuse utilities**
 - Import BigQuery helpers from `src/volu_bq/` (client, query, cache).
