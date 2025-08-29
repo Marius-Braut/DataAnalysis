@@ -66,14 +66,6 @@ DataAnalysis/
 
 Each analysis is a self-contained feature under `src/features/`.
 
-### Step-by-step
-
----
-
-## Adding another analysis
-
-Each analysis is a self-contained feature under `src/features/`.
-
 1. **Create the new module**
 ```text
 src/features/<new_analysis>/
