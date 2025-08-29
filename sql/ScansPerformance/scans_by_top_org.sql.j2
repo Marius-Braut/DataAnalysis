@@ -1,0 +1,11 @@
+-- Scans count by top_organisation within a date range.
+-- Parameters:
+--   @start_date (DATE), @end_date (DATE), @top_organisation (STRING, optional)
+SELECT
+  top_organisation,
+  COUNT(*) AS scans
+FROM `volumental-data.scans.successful`
+WHERE local_date BETWEEN @start_date AND @end_date
+  AND (@top_organisation IS NULL OR top_organisation = @top_organisation)
+GROUP BY top_organisation
+ORDER BY scans DESC
