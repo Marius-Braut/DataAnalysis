@@ -39,8 +39,10 @@ clean-reports:
 		echo "❌ Please specify which analysis to clean, e.g. make clean-reports analysis=FitAccuracy"; \
 		exit 1; \
 	fi
-	rm -rf reports/$(analysis)
-	@echo "🧹 Reports folder for $(analysis) has been fully removed ✅"
+	rm -rf reports/$(analysis)/*
+	rm -rf data/$(analysis)/cache/*
+	@echo "🧹 Reports and cache for $(analysis) have been cleaned ✅"
+
 
 # Convenience cleaners for common analyses
 clean-fit-accuracy:
@@ -66,3 +68,14 @@ rerun-scans-performance:
 	$(MAKE) clean-scans-performance
 	$(MAKE) run-scans-performance start=$(start) end=$(end) $(if $(top_org),top_org="$(top_org)",)
 	@echo "♻️  ScansPerformance rerun completed successfully for $(start) → $(end)."
+
+.PHONY: clean-cache
+
+# Clean cached data for one analysis
+clean-cache:
+	@if [ -z "$(analysis)" ]; then \
+		echo "❌ Please specify which analysis cache to clean, e.g. make clean-cache analysis=FitAccuracy"; \
+		exit 1; \
+	fi
+	rm -rf data/$(analysis)/cache
+	@echo "🧹 Cache for $(analysis) has been cleared ✅"
