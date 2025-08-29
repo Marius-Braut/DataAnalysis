@@ -19,6 +19,12 @@ First analysis: **FitAccuracy**.
 ### Environment variables
 - A `.env` file in the project root contains runtime config such as:
 
+GCP_PROJECT=volumental-data
+BQ_LOCATION=EU
+MAX_BYTES_BILLED=80000000000
+CACHE_DIR=./data
+REPORTS_DIR=./reports
+
 - The `.env` file is loaded automatically when running analyses.
 
 ### Run Configuration (PyCharm)
@@ -36,22 +42,23 @@ When you click **Run** in PyCharm:
 
 ## Project structure
 
+```text
 DataAnalysis/
-├─ .env # not committed; local config
-├─ .env.example # template for teammates
+├─ .env                  # not committed; local config
+├─ .env.example          # template for teammates
 ├─ README.md
 ├─ requirements.txt
-├─ sql/ # SQL templates (Jinja2)
-│ └─ fit_accuracy.sql.j2
+├─ sql/                  # SQL templates (Jinja2)
+│   └─ fit_accuracy.sql.j2
 ├─ src/
-│ ├─ volu_bq/ # shared BigQuery utilities
-│ └─ features/
-│ └─ fit_accuracy/ # first analysis
-│ ├─ run.py
-│ ├─ metrics.py
-│ └─ viz.py
-├─ data/ # local cache (gitignored)
-└─ reports/ # outputs (csv/png/md)
+│   ├─ volu_bq/          # shared BigQuery utilities
+│   └─ features/
+│       └─ fit_accuracy/ # first analysis
+│           ├─ run.py
+│           ├─ metrics.py
+│           └─ viz.py
+├─ data/                 # local cache (gitignored)
+└─ reports/              # outputs (csv/png/md)
 
 ---
 
@@ -89,13 +96,3 @@ Copy code
   ```
   --start 2025-01-01 --end 2025-03-31
   ```
-
-5. **Test on a small slice**
-- Run with a short date range to validate correctness and cost.
-- Outputs should appear in `reports/`.
-
-6. **Commit to Git**
-```bash
-git add .
-git commit -m "Add <new_analysis> feature"
-git push origin main
