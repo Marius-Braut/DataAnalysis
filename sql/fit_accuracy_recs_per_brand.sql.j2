@@ -1,0 +1,6 @@
+SELECT
+  r_brand AS brand_name,
+  COUNT(*) AS recs
+FROM `volumental-insights-staging.recommendations_analyses.rw_identified_scans_with_recs_and_trans3`
+GROUP BY brand_name
+ORDER BY recs DESC

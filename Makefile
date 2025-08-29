@@ -1,8 +1,11 @@
-# Default target
 help:
-	@echo "Available targets:"
-	@echo "  make run-fit-accuracy start=YYYY-MM-DD end=YYYY-MM-DD"
+	@echo "Usage:"
+	@echo "  make run-fit-accuracy   # Run FitAccuracy analysis"
+	@echo "  make clean-reports      # Delete everything in reports/"
 
-# Run Fit Accuracy analysis
 run-fit-accuracy:
-	python src/features/fit_accuracy/run.py --start $(start) --end $(end)
+	python -m src.features.fit_accuracy.run
+
+clean-reports:
+	rm -rf reports/*
+	@echo "Reports have been cleaned 🧹"
