@@ -1,0 +1,31 @@
+-- Parameters (accepted but dates currently unused):
+--   @start_date (DATE, optional), @end_date (DATE, optional), @brand (STRING, optional)
+
+WITH base AS (
+  SELECT
+    scan_id,
+    r_brand,
+    was_purchased,
+    gbs_was_purchased,
+    t_brand
+  FROM `volumental-insights-staging.recommendations_analyses.rw_identified_scans_with_recs_and_trans3`
+  WHERE (@brand IS NULL OR r_brand = @brand)
+),
+per_scan AS (
+  SELECT
+    scan_id,
+    LOGICAL_OR(t_brand IS NOT NULL) AS has_purchase,
+    LOGICAL_OR(was_purchased) AS exact_match,
+    LOGICAL_OR(gbs_was_purchased) AS gbs_match_size_diff
+  FROM base
+  GROUP BY scan_id
+)
+SELECT
+  COUNT(*) AS scans_total,
+  COUNTIF(has_purchase) AS scans_with_purchase,
+  COUNTIF(exact_match) AS scans_exact_match,
+  COUNTIF(gbs_match_size_diff AND NOT exact_match) AS scans_gbs_size_diff_only,
+  SAFE_DIVIDE(COUNTIF(exact_match), NULLIF(COUNTIF(has_purchase), 0)) AS fit_accuracy_rate_exact,
+  SAFE_DIVIDE(COUNTIF(gbs_match_size_diff AND NOT exact_match), NULLIF(COUNTIF(has_purchase), 0)) AS rate_gbs_size_diff_only,
+  SAFE_DIVIDE(COUNTIF(exact_match OR gbs_match_size_diff), NULLIF(COUNTIF(has_purchase), 0)) AS rate_exact_or_gbs
+FROM per_scan;

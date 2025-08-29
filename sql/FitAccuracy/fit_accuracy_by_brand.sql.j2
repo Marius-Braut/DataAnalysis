@@ -1,0 +1,44 @@
+-- Parameters (accepted but dates currently unused):
+--   @start_date (DATE, optional), @end_date (DATE, optional), @brand (STRING, optional)
+
+WITH base AS (
+  SELECT
+    scan_id,
+    r_brand,
+    was_purchased,
+    gbs_was_purchased,
+    t_brand
+  FROM `volumental-insights-staging.recommendations_analyses.rw_identified_scans_with_recs_and_trans3`
+  WHERE (@brand IS NULL OR r_brand = @brand)
+),
+flags AS (
+  SELECT
+    scan_id,
+    ARRAY_AGG(IF(was_purchased, r_brand, NULL) IGNORE NULLS)[OFFSET(0)] AS brand_exact,
+    ARRAY_AGG(IF(gbs_was_purchased, r_brand, NULL) IGNORE NULLS)[OFFSET(0)] AS brand_gbs,
+    LOGICAL_OR(t_brand IS NOT NULL) AS has_purchase,
+    LOGICAL_OR(was_purchased) AS exact_match,
+    LOGICAL_OR(gbs_was_purchased) AS gbs_match_size_diff
+  FROM base
+  GROUP BY scan_id
+),
+labeled AS (
+  SELECT
+    COALESCE(brand_exact, brand_gbs) AS brand_name,
+    has_purchase,
+    exact_match,
+    gbs_match_size_diff
+  FROM flags
+  WHERE has_purchase
+)
+SELECT
+  brand_name,
+  COUNT(*) AS scans_with_purchase,
+  COUNTIF(exact_match) AS scans_exact_match,
+  COUNTIF(gbs_match_size_diff AND NOT exact_match) AS scans_gbs_size_diff_only,
+  SAFE_DIVIDE(COUNTIF(exact_match), NULLIF(COUNT(*), 0)) AS fit_accuracy_rate_exact,
+  SAFE_DIVIDE(COUNTIF(gbs_match_size_diff AND NOT exact_match), NULLIF(COUNT(*), 0)) AS rate_gbs_size_diff_only,
+  SAFE_DIVIDE(COUNTIF(exact_match OR gbs_match_size_diff), NULLIF(COUNT(*), 0)) AS rate_exact_or_gbs
+FROM labeled
+GROUP BY brand_name
+ORDER BY scans_with_purchase DESC;

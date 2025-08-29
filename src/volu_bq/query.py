@@ -1,3 +1,6 @@
+# src/volu_bq/query.py
+
+from __future__ import annotations
 import os
 from typing import Optional, Dict, Any, List
 import pandas as pd
@@ -8,7 +11,6 @@ def _to_bq_params(params: Optional[Dict[str, Any]]) -> Optional[List[bigquery.Sc
         return None
     out: List[bigquery.ScalarQueryParameter] = []
     for k, v in params.items():
-        # Infer simple types
         if isinstance(v, bool):
             out.append(bigquery.ScalarQueryParameter(k, "BOOL", v))
         elif isinstance(v, int):
@@ -16,19 +18,13 @@ def _to_bq_params(params: Optional[Dict[str, Any]]) -> Optional[List[bigquery.Sc
         elif isinstance(v, float):
             out.append(bigquery.ScalarQueryParameter(k, "FLOAT64", v))
         else:
-            # Dates should be 'YYYY-MM-DD' strings; BigQuery DATE param
-            # If you want DATETIME/TIMESTAMP, adjust here.
-            if k.endswith("date") or k.endswith("start_date") or k.endswith("end_date"):
+            if k.endswith("date"):
                 out.append(bigquery.ScalarQueryParameter(k, "DATE", v))
             else:
                 out.append(bigquery.ScalarQueryParameter(k, "STRING", v))
     return out
 
 def run_sql_file(path: str, *, params: Optional[Dict[str, Any]] = None, maximum_bytes_billed: Optional[int] = None) -> pd.DataFrame:
-    """
-    Reads a SQL file and executes it in BigQuery, returning a DataFrame.
-    Supports named scalar parameters via @param_name in the SQL.
-    """
     with open(path, "r", encoding="utf-8") as f:
         sql = f.read()
 
